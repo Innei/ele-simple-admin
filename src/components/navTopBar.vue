@@ -6,22 +6,31 @@
     router
     @select="handleSelect"
   >
-    <el-menu-item index="/dashboard">{{user_data.username}}</el-menu-item>
+    <el-menu-item index="/dashboard">概要</el-menu-item>
 
-    <el-menu-item index="3" style="float: right">消息中心</el-menu-item>
+    <el-submenu index="/manage" class="sub">
+      <template slot="title"
+        >管理
+      </template>
+      <el-menu-item index="/manage/create">撰写</el-menu-item>
+      <el-menu-item index="/manage/list">文章</el-menu-item>
+    </el-submenu>
+    <el-submenu index="3" style="float: right">
+      <template slot="title"
+        >{{ user_data.username }}
+      </template>
+      <el-menu-item>登出</el-menu-item>
+      <el-menu-item>设置</el-menu-item></el-submenu
+    >
   </el-menu>
 </template>
 
 <script>
-
 export default {
   data() {
-    return {
-      
-      activeIndex: "/dashboard",
-    };
+    return {}
   },
-  props:{
+  props: {
     user_data: {
       type: Object,
       required: true
@@ -29,10 +38,15 @@ export default {
   },
   methods: {
     handleSelect(key, keyPath) {
-      console.log(key, keyPath);
+      console.log(key, keyPath)
+    }
+  },
+  computed: {
+    activeIndex() {
+      return this.$route.path
     }
   }
-};
+}
 </script>
 
 <style scoped>
@@ -43,9 +57,20 @@ a {
 ul {
   padding: 0 4rem;
 }
+ul li {
+  height: 3rem !important;
+  line-height: 3rem !important;
+}
 @media (max-width: 600px) {
   ul {
     padding: 0;
   }
+}
+</style>
+
+<style>
+.el-submenu__title {
+  height: 3rem !important;
+  line-height: 3rem !important;
 }
 </style>

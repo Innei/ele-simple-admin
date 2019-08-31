@@ -10,12 +10,24 @@ export default new Router({
       path: '/',
       name: 'home',
       component: Home,
+      redirect: '/dashboard',
       children: [
         {
           path: '/dashboard',
           name: 'dashboard',
-          component: () => import('./views/Dashboard.vue'),
-          
+          meta: { title: ['概要'] },
+          component: () => import('./views/Dashboard.vue')
+        },
+        {
+          path: '/manage',
+          name: 'manage',
+          component: () => import('./views/Manage.vue')
+        },
+        {
+          path: '/manage/list',
+          name: 'list',
+          meta: { title: ['管理', '所有文章'] },
+          component: () => import('./views/ListPosts.vue')
         }
       ]
     }

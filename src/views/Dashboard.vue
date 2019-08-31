@@ -18,7 +18,10 @@
           <main>
             <li v-for="item in userData.recentlyPosts" :key="item._id">
               {{convertDate(item.createTime).month}}/{{convertDate(item.createTime).day}}
-              <a :href="'http://localhost:3000/posts/' + item._id" target="_blank">{{item.title}}</a>
+              <a
+                :href="'http://localhost:3000/posts/' + item._id"
+                target="_blank"
+              >{{item.title}}</a>
             </li>
           </main>
         </div>

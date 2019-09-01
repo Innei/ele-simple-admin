@@ -57,5 +57,7 @@ body::-webkit-scrollbar-track:hover {
   border-radius: 0;
   box-shadow: inset 1px 0 0 rgba(0, 0, 0, 0.1);
 }
-
+.el-form-item__label {
+  user-select: none;
+}
 </style>

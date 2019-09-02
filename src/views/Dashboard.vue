@@ -26,10 +26,10 @@
               {{ convertDate(item.createTime).month }}/{{
                 convertDate(item.createTime).day
               }}
-              <a
+              <el-link
                 :href="'http://localhost:3000/posts/' + item._id"
                 target="_blank"
-                >{{ item.title }}</a
+                >{{ item.title }}</el-link
               >
             </li>
           </main>

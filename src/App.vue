@@ -1,7 +1,5 @@
 <template>
-  
-    <router-view/>
-  
+  <router-view />
 </template>
 
 <style>
@@ -40,9 +38,11 @@ body {
 }
 ::-webkit-scrollbar {
   width: 3px;
-  height: 0px;
+  height: 3px;
 }
-
+body::-webkit-scrollbar {
+  height: 0;
+}
 ::-webkit-scrollbar-track:hover {
   border-radius: 4px;
   background: rgba(189, 195, 199, 0.1);
@@ -59,5 +59,8 @@ body::-webkit-scrollbar-track:hover {
 }
 .el-form-item__label {
   user-select: none;
+}
+* {
+  scroll-behavior: smooth;
 }
 </style>

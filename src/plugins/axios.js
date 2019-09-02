@@ -1,19 +1,38 @@
-import axios from "axios";
+import axios from 'axios'
 
 const http = axios.create({
   baseURL: process.env.VUE_APP_SERVER_URL || 'http://localhost:3000/api'
 })
 
-axios.interceptors.request.use(
+http.interceptors.request.use(
   config => {
     if (localStorage.token) {
-      config.headers.Authorization = localStorage.token;
+      config.headers.Authorization = localStorage.token
     }
-    return config;
+    return config
   },
   err => {
-    return Promise.reject(err);
+    return Promise.reject(err)
   }
-);
+)
 
-export default http;
+http.interceptors.response.use(
+  res => {
+    return res
+  },
+  err => {
+    if (!err.response) {
+      Vue.prototype.$message.error(err.message)
+      return Promise.reject(err)
+    }
+    if (err.response.data.msg) {
+      Vue.prototype.$message.error(err.response.data.msg)
+
+      if (err.response.status === 401) {
+        router.push('/login')
+      }
+    }
+    return Promise.reject(err)
+  }
+)
+export default http

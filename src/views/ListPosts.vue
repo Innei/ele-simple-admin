@@ -9,7 +9,7 @@
 
           <el-form-item label="文章状态: " class="item">
             <el-select v-model="search.state" placeholder>
-              <el-option label="未审核" value="0"></el-option>
+              <!-- <el-option label="未审核" value="0"></el-option> -->
               <el-option label="已发布" value="1"></el-option>
               <el-option label="已过期" value="2"></el-option>
             </el-select>
@@ -45,7 +45,7 @@
             </el-table-column>
           </el-table>
           <el-pagination
-            :hide-on-single-page="false"
+            :hide-on-single-page="true"
             :page-count="options.totalPage"
             :current-page="options.currentPage"
             @current-change="handleChangePage"
@@ -73,18 +73,20 @@ export default {
     };
   },
   methods: {
-    getPostsList(page) {
+    getPostsList(page, keyword, state) {
       this.$http
         .get("/posts", {
           params: {
-            page
+            page,
+            keyword,
+            state
           }
         })
         .then(res => {
           res.data.data.map(item => {
             item.state =
-              (item.outdateTime < Date.now() || item.limitTime === 0) &&
-              item.isOutdate
+              (item.outdateTime < Date.now() && item.isOutdate) ||
+              item.limitTime === 0
                 ? "已过期"
                 : "已发布";
             item.modifyTime = moment(
@@ -96,9 +98,15 @@ export default {
           this.options = res.data.options;
         });
     },
-    onSearch() {},
+    onSearch() {
+      const keyword = this.search.keyword;
+      const state = this.search.state;
+
+      this.getPostsList(1, keyword, state);
+    },
     reset() {
       this.search = { keyword: "", state: "" };
+      this.getPostsList(1)
     },
     newPost() {},
     handleEdit(index, row) {},
@@ -108,7 +116,7 @@ export default {
       document.querySelector("body > main > ul").scrollIntoView({
         behavior: "smooth"
       });
-      this.getPostsList(page);
+      this.getPostsList(page, this.search.keyword);
     }
   },
   created() {
@@ -133,6 +141,6 @@ export default {
   display: flex;
   width: 100%;
   justify-content: center;
-  margin-top: .8rem
+  margin-top: 0.8rem;
 }
 </style>

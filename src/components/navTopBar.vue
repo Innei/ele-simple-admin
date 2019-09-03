@@ -12,8 +12,8 @@
       <template slot="title"
         >管理
       </template>
-      <el-menu-item index="/manage/create">撰写</el-menu-item>
-      <el-menu-item index="/manage/list">文章</el-menu-item>
+      <el-menu-item index="/manage/edit">撰写</el-menu-item>
+      <el-menu-item index="/manage/list">所有文章</el-menu-item>
     </el-submenu>
     <el-submenu index="3" style="float: right">
       <template slot="title"

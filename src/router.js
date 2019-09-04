@@ -20,25 +20,40 @@ const router = new Router({
         {
           path: '/manage',
           name: 'manage',
-          component: () => import('./views/Manage.vue'),
+          component: () => import('./layout/BlankLayout.vue'),
           meta: { title: ['管理'] },
           children: [
             {
               path: 'edit',
+              name: 'edit',
               meta: { title: ['管理', '编辑文章'] },
-              component: () => import('./views/EditPosts.vue')
+              props: true,
+              component: () => import('./views/manage/EditPosts.vue')
             },
             {
               path: 'list',
               name: 'list',
               meta: { title: ['管理', '所有文章'] },
-              component: () => import('./views/ListPosts.vue')
+              component: () => import('./views/manage/ListPosts.vue')
             }
           ]
         }
       ]
+    },
+    {
+      name: 'login',
+      path: '/login',
+      meta: { isPublic: true },
+      component: () => import('@/views/user/Login.vue')
     }
   ]
+})
+
+router.beforeEach((to, from, next) => {
+  if (!to.meta.isPublic && !localStorage.token) {
+    return next('/login')
+  }
+  next()
 })
 
 export default router

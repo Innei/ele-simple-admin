@@ -1,5 +1,6 @@
 import axios from 'axios'
-
+import Vue from 'vue'
+import router from './../router'
 const http = axios.create({
   baseURL: process.env.VUE_APP_SERVER_URL || 'http://localhost:3000/api'
 })
@@ -30,6 +31,7 @@ http.interceptors.response.use(
 
       if (err.response.status === 401) {
         router.push('/login')
+        
       }
     }
     return Promise.reject(err)

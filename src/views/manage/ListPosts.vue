@@ -106,10 +106,22 @@ export default {
     },
     reset() {
       this.search = { keyword: "", state: "" };
-      this.getPostsList(1)
+      this.getPostsList(1);
     },
-    newPost() {},
-    handleEdit(index, row) {},
+    newPost() {
+      this.$router.push({ name: "edit" });
+    },
+    handleEdit(index, row) {
+      this.$router.push({
+        name: "edit",
+        query: {
+          id: row._id
+        },
+        params: {
+          id: row._id
+        }
+      });
+    },
     handleDelete(index, row) {},
     handleChangePage(page) {
       // 平滑滚动

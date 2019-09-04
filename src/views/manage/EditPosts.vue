@@ -82,11 +82,23 @@ export default {
   methods: {
     async submit() {
       try {
-        const response = await postApi.create(this.model);
-        this.$message({
-          message: "提交成功",
-          type: "success"
-        });
+        let response;
+        if (this.id || this.$route.query.id) {
+          response = await postApi.edit(
+            this.id || this.$route.query.id,
+            this.model
+          );
+          if (response.data.ok !== 1) {
+            this.$message.error("出错了");
+          }
+        } else {
+          response = await postApi.create(this.model);
+          this.$message({
+            message: "提交成功",
+            type: "success"
+          });
+        }
+        // const response = await postApi.create(this.model);
         this.$router.push("/manage/list");
       } catch (e) {
         this.$message.error("出错了");
@@ -95,18 +107,29 @@ export default {
     save() {},
     convertTime() {
       this.model.outdateTime = this.dataTime.getTime();
-    },
-    async update() {
-      
     }
+    // async update() {
+    //   try {
+    //     const response = await postApi.edit(
+    //       this.id || this.$route.query.id,
+    //       this.model
+    //     );
+    //     this.$message({
+    //       message: "更新成功",
+    //       type: "success"
+    //     });
+    //     this.$router.push("/manage/list");
+    //   } catch (e) {
+    //     this.$message.error("出错了");
+    //   }
+    // }
   },
   async created() {
-  
     if (this.id || this.$route.query.id) {
       const response = await postApi.getPost(this.id || this.$route.query.id);
       console.log(1);
       this.model = response.data;
-      this.dataTime = new Date(this.model.outdateTime)
+      this.dataTime = new Date(this.model.outdateTime);
     }
   }
 };

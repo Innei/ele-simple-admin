@@ -60,6 +60,7 @@
 
 <script>
 import moment from "moment";
+import postApi from "@/api/post";
 moment.locale("zh-cn");
 export default {
   data() {
@@ -122,7 +123,14 @@ export default {
         }
       });
     },
-    handleDelete(index, row) {},
+    async handleDelete(index, row) {
+      const response = await postApi.del(row._id);
+      //nRemoved
+      if (response.data.ok === 1) {
+        this.$message.success("删除成功");
+        this.getPostsList(1);
+      }
+    },
     handleChangePage(page) {
       // 平滑滚动
       document.querySelector("body > main > ul").scrollIntoView({

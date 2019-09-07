@@ -17,11 +17,11 @@ postApi.getLists = params => {
     params
   })
 }
-postApi.edit = (id, data) => {
+postApi.edit = (id, data, params) => {
   return http({
     method: 'PUT',
     url: baseUrl + '/' + 'edit',
-    params: { id },
+    params: { id, ...params },
     data
   })
 }
@@ -31,5 +31,17 @@ postApi.getPost = id => {
 }
 postApi.del = id => {
   return http.delete(`${baseUrl}/${id}`)
+}
+
+postApi.save = (id, draft, data) => {
+  return http({
+    method: 'post',
+    url: baseUrl + '/save',
+    params: {
+      id,
+      draft
+    },
+    data
+  })
 }
 export default postApi

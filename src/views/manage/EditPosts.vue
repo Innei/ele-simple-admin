@@ -18,11 +18,7 @@
             <el-collapse v-model="activeNames">
               <el-collapse-item title="是否过期" name="1-1">
                 <p>在这里指定该文章是否存在过期的限制, 以时间计算</p>
-                <el-switch
-                  v-model="model.isOutdate"
-                  active-text="指定过期时间"
-                  inactive-text="永不过期"
-                ></el-switch>
+                <el-switch v-model="model.isOutdate" active-text="指定过期时间" inactive-text="永不过期"></el-switch>
                 <el-collapse-transition>
                   <div class="picker" v-if="model.isOutdate">
                     <el-date-picker
@@ -53,9 +49,11 @@
 
     <el-footer>
       <div class="right">
-        <el-button type="primary" @click="submit">{{
-          id ? '更新' : '发布'
-        }}</el-button>
+        <el-button type="primary" @click="submit()">
+          {{
+          id ? draft ? '发布' : '更新' : '发布'
+          }}
+        </el-button>
         <el-button @click="save">保存草稿</el-button>
       </div>
     </el-footer>
@@ -63,30 +61,33 @@
 </template>
 
 <script>
-import 'mavon-editor/dist/css/index.css'
-import { mavonEditor } from 'mavon-editor'
-import { toolbars } from '@/core/toolbar'
-import pickerOptions from '@/core/picker'
-import postApi from '@/api/post'
-import uploadApi from '@/api/upload'
+import "mavon-editor/dist/css/index.css";
+import { mavonEditor } from "mavon-editor";
+import { toolbars } from "@/core/toolbar";
+import pickerOptions from "@/core/picker";
+import postApi from "@/api/post";
+import uploadApi from "@/api/upload";
+import { log } from "util";
 export default {
   props: {
-    id: {}
+    id: {},
+    draft: {},
+    pid: {}
   },
   data() {
     return {
       model: {
-        title: '',
-        content: '',
+        title: "",
+        content: "",
         limitTime: -1,
         isOutdate: false,
         outdateTime: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7).getTime()
       },
       toolbars,
-      activeNames: ['1-1'],
+      activeNames: ["1-1"],
       ...pickerOptions,
       dataTime: null
-    }
+    };
   },
   components: {
     mavonEditor
@@ -94,31 +95,54 @@ export default {
   methods: {
     async submit() {
       try {
-        let response
+        let response;
         if (this.id || this.$route.query.id) {
-          response = await postApi.edit(
-            this.id || this.$route.query.id,
-            this.model
-          )
+          if (this.draft) {
+            if (!this.pid) {
+              response = await postApi.create(this.model);
+            } else {
+              response = await postApi.edit(this.id, this.model, {
+                update: 1,
+                pid: this.pid
+              });
+            }
+          } else {
+            response = await postApi.edit(
+              this.id || this.$route.query.id,
+              this.model
+            );
+          }
+
           if (response.data.ok !== 1) {
-            this.$message.error('出错了')
+            this.$message.error("出错了");
           }
         } else {
-          response = await postApi.create(this.model)
+          response = await postApi.create(this.model);
           this.$message({
-            message: '提交成功',
-            type: 'success'
-          })
+            message: "提交成功",
+            type: "success"
+          });
         }
         // const response = await postApi.create(this.model);
-        this.$router.push('/manage/list')
+        this.$router.push("/manage/list");
       } catch (e) {
-        this.$message.error('出错了')
+        this.$message.error("出错了");
       }
     },
-    save() {},
+    async save() {
+      const response = await postApi.save(this.id, this.draft, this.model);
+      if (response.data.ok) {
+        this.$message({
+          message: "保存成功",
+          type: "success"
+        });
+        this.$router.push("/manage/list");
+      } else {
+        this.$message.error("出错了");
+      }
+    },
     convertTime() {
-      this.model.outdateTime = this.dataTime.getTime()
+      this.model.outdateTime = this.dataTime.getTime();
     },
     // async update() {
     //   try {
@@ -137,8 +161,8 @@ export default {
     // }
     $imgAdd(pos, $file) {
       // 第一步.将图片上传到服务器.
-      var formdata = new FormData()
-      formdata.append('file', $file)
+      var formdata = new FormData();
+      formdata.append("file", $file);
       uploadApi.uploadFile(formdata).then(res => {
         // 第二步.将返回的url替换到文本原位置![...](./0) -> ![...](url)
         /**
@@ -146,19 +170,19 @@ export default {
          * 1. 通过引入对象获取: `import {mavonEditor} from ...` 等方式引入后，`$vm`为`mavonEditor`
          * 2. 通过$refs获取: html声明ref : `<mavon-editor ref=md ></mavon-editor>，`$vm`为 `this.$refs.md`
          */
-        this.$refs.md.$img2Url(pos, res.data.url)
-      })
+        this.$refs.md.$img2Url(pos, res.data.url);
+      });
     }
   },
   async created() {
     if (this.id || this.$route.query.id) {
-      const response = await postApi.getPost(this.id || this.$route.query.id)
-      console.log(1)
-      this.model = response.data
-      this.dataTime = new Date(this.model.outdateTime)
+      const response = await postApi.getPost(this.id || this.$route.query.id);
+      console.log(1);
+      this.model = response.data;
+      this.dataTime = new Date(this.model.outdateTime);
     }
   }
-}
+};
 </script>
 
 <style>

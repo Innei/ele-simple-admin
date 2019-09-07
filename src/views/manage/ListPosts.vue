@@ -40,26 +40,11 @@
             v-loading="loading"
           >
             <el-table-column type="selection"></el-table-column>
-            <el-table-column
-              prop="title"
-              label="标题"
-              width="180"
-            ></el-table-column>
-            <el-table-column
-              prop="state"
-              label="状态"
-              width="180"
-            ></el-table-column>
+            <el-table-column prop="title" label="标题" width="180"></el-table-column>
+            <el-table-column prop="state" label="状态" width="180"></el-table-column>
             <el-table-column label="评论量" width="100"></el-table-column>
-            <el-table-column
-              prop="views"
-              label="访问量"
-              width="100"
-            ></el-table-column>
-            <el-table-column
-              prop="modifyTime"
-              label="更新时间"
-            ></el-table-column>
+            <el-table-column prop="views" label="访问量" width="100"></el-table-column>
+            <el-table-column prop="modifyTime" label="更新时间"></el-table-column>
             <!-- <el-table-column label="操作" width="180">
               <template slot-scope="scope">
                 <el-button
@@ -74,22 +59,16 @@
                   >删除</el-button
                 >
               </template>
-            </el-table-column> -->
+            </el-table-column>-->
             <el-table-column fixed="right" label="操作" width="100">
               <template slot-scope="scope">
-                <el-button
-                  type="text"
-                  size="small"
-                  @click="handleEdit(scope.$index, scope.row)"
-                  >编辑</el-button
-                >
+                <el-button type="text" size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
                 <el-button
                   style="color: #F56C6C"
                   @click="handleDelete(scope.$index, scope.row)"
                   type="text"
                   size="small"
-                  >删除</el-button
-                >
+                >删除</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -110,28 +89,28 @@
 </template>
 
 <script>
-import moment from 'moment'
-import postApi from '@/api/post'
-moment.locale('zh-cn')
+import moment from "moment";
+import postApi from "@/api/post";
+moment.locale("zh-cn");
 export default {
   data() {
     return {
       posts: [],
       search: {
-        keyword: '',
-        state: ''
+        keyword: "",
+        state: ""
       },
       options: {},
       loading: true,
       showBar: false,
       selectedItems: []
-    }
+    };
   },
   methods: {
     getPostsList(page, keyword, state) {
-      this.loading = true
+      this.loading = true;
       this.$http
-        .get('/posts', {
+        .get("/posts", {
           params: {
             page,
             keyword,
@@ -140,110 +119,117 @@ export default {
         })
         .then(res => {
           res.data.data.map(item => {
-            item.state =
-              (item.outdateTime < Date.now() && item.isOutdate) ||
-              item.limitTime === 0
-                ? '已过期'
-                : '已发布'
+            if (item.state === 0) {
+              item.state = "草稿";
+            } else {
+              item.state =
+                (item.outdateTime < Date.now() && item.isOutdate) ||
+                item.limitTime === 0
+                  ? "已过期"
+                  : "已发布";
+            }
+
             item.modifyTime = moment(
               new Date(Number(item.modifyTime))
-            ).fromNow()
-            return item
-          })
-          this.posts = res.data.data
-          this.options = res.data.options
-        })
-      this.loading = false
+            ).fromNow();
+            return item;
+          });
+          this.posts = res.data.data;
+          this.options = res.data.options;
+        });
+      this.loading = false;
     },
     onSearch() {
-      const keyword = this.search.keyword
-      const state = this.search.state
+      const keyword = this.search.keyword;
+      const state = this.search.state;
 
-      this.getPostsList(1, keyword, state)
+      this.getPostsList(1, keyword, state);
     },
     reset() {
-      this.search = { keyword: '', state: '' }
-      this.getPostsList(1)
+      this.search = { keyword: "", state: "" };
+      this.getPostsList(1);
     },
     newPost() {
-      this.$router.push({ name: 'edit' })
+      this.$router.push({ name: "edit" });
     },
     handleEdit(index, row) {
       this.$router.push({
-        name: 'edit',
+        name: "edit",
         query: {
           id: row._id
         },
         params: {
-          id: row._id
+          id: row._id,
+          draft: row.state === "草稿" ? 1 : 0,
+          pid: row.pid
         }
-      })
+      });
     },
     async handleDelete(index, row) {
-      this.$confirm('此操作将永久删除该文章, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
+      this.$confirm("此操作将永久删除该文章, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
       })
         .then(async () => {
-          const response = await postApi.del(row._id)
+          const response = await postApi.del(row._id);
           //nRemoved
           if (response.data.ok === 1) {
-            this.$message.success('删除成功')
-            this.getPostsList(1)
+            this.$message.success("删除成功");
+            this.getPostsList(1);
           }
         })
         .catch(() => {
           this.$message({
-            type: 'info',
-            message: '已取消删除'
-          })
-        })
+            type: "info",
+            message: "已取消删除"
+          });
+        });
     },
     handleChangePage(page) {
       // 平滑滚动
-      document.querySelector('body > main > ul').scrollIntoView({
-        behavior: 'smooth'
-      })
-      this.getPostsList(page, this.search.keyword)
+      document.querySelector("body > main > ul").scrollIntoView({
+        behavior: "smooth"
+      });
+      this.getPostsList(page, this.search.keyword);
     },
     handleSelectionChange(val) {
-      this.selectedItems = val
+      this.selectedItems = val;
       if (val.length > 1) {
-        this.showBar = true
+        this.showBar = true;
       } else {
-        this.showBar = false
+        this.showBar = false;
       }
     },
     handleDelMore() {
-      this.$confirm('此操作将永久删除这些文章, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
+      this.$confirm("此操作将永久删除这些文章, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
       })
         .then(async () => {
           // const ids = [...this.selectedItems.map(item => item._id)]
 
           for (const item of this.selectedItems) {
-            const response = await postApi.del(item._id)
+            const response = await postApi.del(item._id);
             if (response.data.ok === 1) {
-              this.$message.success(`${item.title} 删除成功`)
+              this.$message.success(`${item.title} 删除成功`);
             } else {
-              this.$message.error(`${item.title} 删除失败`)
+              this.$message.error(`${item.title} 删除失败`);
             }
           }
 
-          this.getPostsList(1)
+          this.getPostsList(1);
         })
         .catch(e => {
-          this.$message('已取消')
-        })
+          this.$message("已取消");
+        });
     }
   },
   created() {
-    this.getPostsList(1)
+    this.getPostsList(1);
   }
-}
+};
 </script>
 
 <style scoped>

@@ -44,22 +44,7 @@
             <el-table-column prop="state" label="状态" width="180"></el-table-column>
             <el-table-column label="评论量" width="100"></el-table-column>
             <el-table-column prop="views" label="访问量" width="100"></el-table-column>
-            <el-table-column prop="modifyTime" label="更新时间"></el-table-column>
-            <!-- <el-table-column label="操作" width="180">
-              <template slot-scope="scope">
-                <el-button
-                  size="mini"
-                  @click="handleEdit(scope.$index, scope.row)"
-                  >编辑</el-button
-                >
-                <el-button
-                  size="mini"
-                  type="danger"
-                  @click="handleDelete(scope.$index, scope.row)"
-                  >删除</el-button
-                >
-              </template>
-            </el-table-column>-->
+            <el-table-column prop="updateTime" label="更新时间"></el-table-column>
             <el-table-column fixed="right" label="操作" width="100">
               <template slot-scope="scope">
                 <el-button type="text" size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
@@ -91,6 +76,7 @@
 <script>
 import moment from "moment";
 import postApi from "@/api/post";
+import { setInterval, clearInterval } from "timers";
 moment.locale("zh-cn");
 export default {
   data() {
@@ -103,7 +89,8 @@ export default {
       options: {},
       loading: true,
       showBar: false,
-      selectedItems: []
+      selectedItems: [],
+      Interval: null
     };
   },
   methods: {
@@ -128,10 +115,10 @@ export default {
                   ? "已过期"
                   : "已发布";
             }
-
-            item.modifyTime = moment(
+            item.updateTime = moment(
               new Date(Number(item.modifyTime))
             ).fromNow();
+
             return item;
           });
           this.posts = res.data.data;
@@ -166,11 +153,17 @@ export default {
       });
     },
     async handleDelete(index, row) {
-      this.$confirm(`此操作将永久删除该${row.state !== "草稿" ? '文章' : '草稿'}, 是否继续?`, "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      })
+      this.$confirm(
+        `此操作将永久删除该${
+          row.state !== "草稿" ? "文章" : "草稿"
+        }, 是否继续?`,
+        "提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }
+      )
         .then(async () => {
           const response = await postApi.del(row._id);
           //nRemoved
@@ -224,10 +217,26 @@ export default {
         .catch(e => {
           this.$message("已取消");
         });
+    },
+    setTimeUpdate() {
+      this.Interval = setInterval(() => {
+        this.posts.map(item => {
+          item.updateTime = moment(new Date(Number(item.modifyTime))).fromNow();
+          return item;
+        });
+      }, 10000);
+    },
+    clearInterval() {
+      clearInterval(this.Interval);
+      console.log('clear interval.')
     }
   },
   created() {
     this.getPostsList(1);
+    this.setTimeUpdate()
+  },
+  destroyed() {
+    this.clearInterval()
   }
 };
 </script>

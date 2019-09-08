@@ -74,8 +74,6 @@ import { toolbars } from "@/core/toolbar";
 import pickerOptions from "@/core/picker";
 import postApi from "@/api/post";
 import uploadApi from "@/api/upload";
-import { setInterval, clearInterval } from "timers";
-import { log } from "util";
 import moment from "moment";
 moment.locale("zh-cn");
 
@@ -220,13 +218,13 @@ export default {
       const btn = document.querySelector(".footer > .right");
 
       btn.style.opacity = 1;
-      console.log("overed.");
+      // console.log("overed.");
     },
     mouseLeaveOpacity() {
       const btn = document.querySelector(".footer > .right");
 
       btn.style.opacity = 0.3;
-      console.log("leaved.");
+      // console.log("leaved.");
     },
     autoSavePost() {
       // 已发布的文章 自动保存草稿方法

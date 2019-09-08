@@ -1,11 +1,13 @@
 <template>
   <el-container>
-    <el-main style="width: 100%">
+    <el-main>
       <el-form ref="form" :model="model">
         <el-form-item>
           <el-input v-model="model.title" placeholder="标题"></el-input>
         </el-form-item>
         <mavonEditor
+          @change="autoSavePost()"
+          @save="save(false)"
           class="md"
           ref="md"
           v-model="model.content"
@@ -47,8 +49,13 @@
       </el-form>
     </el-main>
 
-    <el-footer>
-      <div class="right">
+    <el-footer
+      class="footer"
+      @mouseover.native="mouseOverOpacity"
+      @mouseleave.native="mouseLeaveOpacity"
+    >
+      <div class="right" style="transition: opacity .5s;opacity: .3">
+        <el-button v-if="hasDraft" @click="goToDraftConfirm">跳转草稿</el-button>
         <el-button type="primary" @click="submit()">
           {{
           id ? draft ? '发布' : '更新' : '发布'
@@ -67,7 +74,11 @@ import { toolbars } from "@/core/toolbar";
 import pickerOptions from "@/core/picker";
 import postApi from "@/api/post";
 import uploadApi from "@/api/upload";
+import { setInterval, clearInterval } from "timers";
 import { log } from "util";
+import moment from "moment";
+moment.locale("zh-cn");
+
 export default {
   props: {
     id: {},
@@ -86,7 +97,10 @@ export default {
       toolbars,
       activeNames: ["1-1"],
       ...pickerOptions,
-      dataTime: null
+      dataTime: null,
+      hasDraft: false,
+      Interval: null,
+      originBody: ""
     };
   },
   components: {
@@ -113,9 +127,9 @@ export default {
             );
           }
 
-          if (response.data.ok !== 1) {
-            this.$message.error("出错了");
-          }
+          // if (response.data.ok !== 1) {
+          //   this.$message.error("出错了");
+          // }
         } else {
           response = await postApi.create(this.model);
           this.$message({
@@ -126,17 +140,23 @@ export default {
         // const response = await postApi.create(this.model);
         this.$router.push("/manage/list");
       } catch (e) {
+        console.log(e);
         this.$message.error("出错了");
       }
     },
-    async save() {
+    async save(push = true, showMsg = true) {
       const response = await postApi.save(this.id, this.draft, this.model);
       if (response.data.ok) {
-        this.$message({
-          message: "保存成功",
-          type: "success"
-        });
-        this.$router.push("/manage/list");
+        if (showMsg) {
+          this.$message({
+            message: "保存成功",
+            type: "success"
+          });
+        }
+
+        if (push) {
+          this.$router.push("/manage/list");
+        }
       } else {
         this.$message.error("出错了");
       }
@@ -144,21 +164,7 @@ export default {
     convertTime() {
       this.model.outdateTime = this.dataTime.getTime();
     },
-    // async update() {
-    //   try {
-    //     const response = await postApi.edit(
-    //       this.id || this.$route.query.id,
-    //       this.model
-    //     );
-    //     this.$message({
-    //       message: "更新成功",
-    //       type: "success"
-    //     });
-    //     this.$router.push("/manage/list");
-    //   } catch (e) {
-    //     this.$message.error("出错了");
-    //   }
-    // }
+
     $imgAdd(pos, $file) {
       // 第一步.将图片上传到服务器.
       var formdata = new FormData();
@@ -172,14 +178,94 @@ export default {
          */
         this.$refs.md.$img2Url(pos, res.data.url);
       });
+    },
+    goToDraftConfirm() {
+      this.$confirm("该文章存在草稿, 是否跳转?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "success"
+      })
+        .then(() => {
+          this.$router.push({
+            name: "edit",
+            query: {
+              id: this.model.draftId
+            },
+            params: {
+              id: this.model.draftId,
+              draft: 1,
+              pid: this.model.pid
+            }
+          });
+        })
+        .catch(() => {});
+    },
+    async getPostInfo() {
+      if (this.id || this.$route.query.id) {
+        const response = await postApi.getPost(this.id || this.$route.query.id);
+        this.model = response.data;
+        this.dataTime = new Date(this.model.outdateTime);
+
+        if (response.data.hasDraft) {
+          this.hasDraft = true;
+          this.goToDraftConfirm();
+        } else {
+          this.hasDraft = false;
+        }
+      }
+
+      this.originBody = this.model.content;
+    },
+    mouseOverOpacity() {
+      const btn = document.querySelector(".footer > .right");
+
+      btn.style.opacity = 1;
+      console.log("overed.");
+    },
+    mouseLeaveOpacity() {
+      const btn = document.querySelector(".footer > .right");
+
+      btn.style.opacity = 0.3;
+      console.log("leaved.");
+    },
+    autoSavePost() {
+      // 已发布的文章 自动保存草稿方法
+
+      if (this.model.state === 1 && this.Interval === null) {
+        // 5000 毫秒执行一次方法
+
+        this.Interval = setInterval(() => {
+          if (this.model.content !== this.originBody) {
+            this.save(false, false);
+            this.originBody = this.model.content;
+
+            const h = this.$createElement;
+
+            this.$notify({
+              title: "自动保存成功",
+              message: h(
+                "i",
+                `${moment(Date.now()).format("YYYY年MM月DD日 HH:mm:ss")}`
+              )
+            });
+          }
+        }, 5000);
+        console.log("Interval start.");
+      }
     }
   },
-  async created() {
-    if (this.id || this.$route.query.id) {
-      const response = await postApi.getPost(this.id || this.$route.query.id);
-      console.log(1);
-      this.model = response.data;
-      this.dataTime = new Date(this.model.outdateTime);
+  created() {
+    this.getPostInfo();
+  },
+  destroyed() {
+    clearInterval(this.Interval);
+    console.log("Interval cleared.");
+  },
+  watch: {
+    $route(to, from) {
+      this.getPostInfo();
+      clearInterval(this.Interval);
+      console.log("Interval cleared.");
     }
   }
 };
@@ -215,5 +301,19 @@ export default {
   display: flex;
   justify-content: flex-start;
   margin-top: 2rem;
+}
+.footer {
+  position: sticky;
+  bottom: 0;
+  transform: translateX(95%);
+  width: 50%;
+  z-index: 999999;
+}
+@media (max-width: 600px) {
+  .footer {
+    transform: none;
+    width: 100%;
+    z-index: 999999;
+  }
 }
 </style>

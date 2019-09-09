@@ -18,25 +18,31 @@ const router = new Router({
           component: () => import('./views/Dashboard.vue')
         },
         {
-          path: '/manage',
-          name: 'manage',
+          path: '/posts',
+          name: 'posts',
           component: () => import('./layout/BlankLayout.vue'),
-          meta: { title: ['管理'] },
+          meta: { title: ['文章'] },
           children: [
             {
               path: 'edit',
               name: 'edit',
-              meta: { title: ['管理', '编辑文章'] },
+              meta: { title: ['文章', '编辑文章'] },
               props: true,
-              component: () => import('./views/manage/EditPosts.vue')
+              component: () => import('./views/posts/EditPosts.vue')
             },
             {
               path: 'list',
               name: 'list',
-              meta: { title: ['管理', '所有文章'] },
-              component: () => import('./views/manage/ListPosts.vue')
+              meta: { title: ['文章', '所有文章'] },
+              component: () => import('./views/posts/ListPosts.vue')
             }
           ]
+        },
+        {
+          path: '/comments',
+          name: 'comments',
+          component: () => import('./views/comments/comments.vue'),
+          meta: { title: ['评论'] }
         }
       ]
     },

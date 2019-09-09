@@ -3,9 +3,10 @@
     <el-main>
       <el-form ref="form" :model="model">
         <el-form-item>
-          <el-input v-model="model.title" placeholder="标题"></el-input>
+          <el-input v-model="model.title" :autofocus="id ? false : true" placeholder="标题"></el-input>
         </el-form-item>
         <mavonEditor
+          :autofocus="false"
           @change="autoSavePost()"
           @save="save(false)"
           class="md"

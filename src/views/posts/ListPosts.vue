@@ -38,6 +38,7 @@
             :data="posts"
             style="overflow: auto"
             v-loading="loading"
+            
           >
             <el-table-column type="selection"></el-table-column>
             <el-table-column prop="title" label="标题" width="180"></el-table-column>
@@ -258,5 +259,8 @@ export default {
   width: 100%;
   justify-content: center;
   margin-top: 0.8rem;
+}
+.bax-card {
+  min-height: 80vh
 }
 </style>

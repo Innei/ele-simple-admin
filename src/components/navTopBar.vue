@@ -8,27 +8,26 @@
   >
     <el-menu-item index="/dashboard">概要</el-menu-item>
 
-    <el-submenu index="/manage" class="sub">
-      <template slot="title"
-        >管理
-      </template>
-      <el-menu-item index="/manage/edit">撰写</el-menu-item>
-      <el-menu-item index="/manage/list">所有文章</el-menu-item>
+    <el-submenu index="/posts" class="sub">
+      <template slot="title">文章</template>
+      <el-menu-item index="/posts/edit">撰写</el-menu-item>
+      <el-menu-item index="/posts/list">所有文章</el-menu-item>
     </el-submenu>
+
+    <el-menu-item index="/comments">评论</el-menu-item>
+
     <el-submenu index="3" style="float: right">
-      <template slot="title"
-        >{{ user_data.username }}
-      </template>
+      <template slot="title">{{ user_data.username }}</template>
       <el-menu-item>登出</el-menu-item>
-      <el-menu-item>设置</el-menu-item></el-submenu
-    >
+      <el-menu-item>设置</el-menu-item>
+    </el-submenu>
   </el-menu>
 </template>
 
 <script>
 export default {
   data() {
-    return {}
+    return {};
   },
   props: {
     user_data: {
@@ -38,15 +37,15 @@ export default {
   },
   methods: {
     handleSelect(key, keyPath) {
-      console.log(key, keyPath)
+      console.log(key, keyPath);
     }
   },
   computed: {
     activeIndex() {
-      return this.$route.path
+      return this.$route.path;
     }
   }
-}
+};
 </script>
 
 <style scoped>

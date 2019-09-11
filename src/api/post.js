@@ -14,23 +14,24 @@ postApi.getLists = params => {
   // })
   return http({
     method: 'GET',
-    params
+    params,
+    url: `${baseUrl}/list`
   })
 }
 postApi.edit = (id, data, params) => {
   return http({
     method: 'PUT',
-    url: baseUrl + '/' + 'edit',
+    url: baseUrl + '/edit',
     params: { id, ...params },
     data
   })
 }
 
 postApi.getPost = id => {
-  return http.get(`${baseUrl}/${id}`)
+  return http.get(`${baseUrl}?id=${id}`)
 }
 postApi.del = id => {
-  return http.delete(`${baseUrl}/${id}`)
+  return http.delete(`${baseUrl}?id=${id}`)
 }
 
 postApi.save = (id, draft, data) => {

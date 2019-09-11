@@ -1,3 +1,5 @@
 import postApi from './post'
-
-export { postApi }
+import commentsApi from './comments'
+import userApi from './user'
+import uploadApi from './upload'
+export { postApi, commentsApi, userApi, uploadApi }

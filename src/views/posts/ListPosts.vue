@@ -38,7 +38,6 @@
             :data="posts"
             style="overflow: auto"
             v-loading="loading"
-            
           >
             <el-table-column type="selection"></el-table-column>
             <el-table-column prop="title" label="标题" width="180"></el-table-column>
@@ -97,13 +96,19 @@ export default {
   methods: {
     getPostsList(page, keyword, state) {
       this.loading = true;
-      this.$http
-        .get("/posts", {
-          params: {
-            page,
-            keyword,
-            state
-          }
+      // this.$http
+      //   .get("/posts/list", {
+      //     params: {
+      //       page,
+      //       keyword,
+      //       state
+      //     }
+      //   })
+      postApi
+        .getLists({
+          page,
+          keyword,
+          state
         })
         .then(res => {
           res.data.data.map(item => {
@@ -229,15 +234,15 @@ export default {
     },
     clearInterval() {
       clearInterval(this.Interval);
-      console.log('clear interval.')
+      console.log("clear interval.");
     }
   },
   created() {
     this.getPostsList(1);
-    this.setTimeUpdate()
+    this.setTimeUpdate();
   },
   destroyed() {
-    this.clearInterval()
+    this.clearInterval();
   }
 };
 </script>
@@ -261,6 +266,6 @@ export default {
   margin-top: 0.8rem;
 }
 .bax-card {
-  min-height: 80vh
+  min-height: 80vh;
 }
 </style>

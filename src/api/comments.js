@@ -2,7 +2,7 @@ import http from '@/plugins/axios'
 
 const api = {}
 
-const baseUrl = 'comments'
+const baseUrl = 'posts/comments'
 
 api.post = data => {
   return http({

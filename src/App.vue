@@ -63,4 +63,14 @@ body::-webkit-scrollbar-track:hover {
 * {
   scroll-behavior: smooth;
 }
+
+a {
+  color: #3498db;
+  text-decoration: none;
+  transition: color 0.5s;
+}
+
+a:hover {
+  color: #ffc670;
+}
 </style>

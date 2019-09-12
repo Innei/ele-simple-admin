@@ -41,7 +41,7 @@ const router = new Router({
         {
           path: '/comments',
           name: 'comments',
-          component: () => import('./views/comments/comments.vue'),
+          component: () => import('./views/comments/ListComments.vue'),
           meta: { title: ['评论'] }
         }
       ]

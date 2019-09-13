@@ -1,6 +1,6 @@
 <template>
   <main>
-    <nav-bar :user_data="user_data"></nav-bar>
+    <nav-bar></nav-bar>
     <Breadcrumb />
     <div class="wrap">
       <transition name="fade" mode="out-in">
@@ -11,24 +11,23 @@
 </template>
 
 <script>
-import NavBar from '../components/navTopBar.vue'
-import Breadcrumb from '../components/Breadcrumb.vue'
+import NavBar from "../components/navTopBar.vue";
+import Breadcrumb from "../components/Breadcrumb.vue";
 export default {
   data() {
-    return {
-      user_data: {}
-    }
+    return {};
   },
   components: {
     NavBar,
     Breadcrumb
   },
   created() {
-    this.$http.get('/user/1').then(res => {
-      this.user_data = res.data
-    })
+    this.$http.get("/user/1").then(res => {
+      this.$store.commit("setUser", res.data.username);
+      this.$store.commit("setEmail", res.data.email);
+    });
   }
-}
+};
 </script>
 
 <style scoped>

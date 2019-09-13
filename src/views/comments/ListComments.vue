@@ -2,9 +2,20 @@
   <el-container>
     <el-header>
       <el-tabs v-model="activeName" @tab-click="handleClick">
-        <el-tab-pane label="已通过" name="pass"></el-tab-pane>
-        <el-tab-pane label="待审核" name="needCheck"></el-tab-pane>
-        <el-tab-pane label="垃圾" name="gomi"></el-tab-pane>
+        <el-tab-pane name="1">
+          <span slot="label" style="position: relative;">
+            已通过
+            <el-badge :value="info.passed" class="badge-a" type="primary" />
+          </span>
+        </el-tab-pane>
+
+        <el-tab-pane name="0">
+          <span slot="label" style="position: relative;">
+            待审核
+            <el-badge :value="info.needChecked" class="badge-a" />
+          </span>
+        </el-tab-pane>
+        <el-tab-pane name="2" label="垃圾"></el-tab-pane>
       </el-tabs>
     </el-header>
     <el-main>
@@ -32,28 +43,31 @@
                     <span>{{ scope.row.author }}</span>
                   </el-form-item>
                   <el-form-item label="邮箱">
-                    <el-link :href="'mailto:' + scope.row.email">
+                    <a :href="'mailto:' + scope.row.email">
                       <span>{{ scope.row.email }}</span>
-                    </el-link>
+                    </a>
                   </el-form-item>
                   <el-form-item label="IP 地址">
                     <span>{{ scope.row.ipAddress }}</span>
                   </el-form-item>
                   <el-form-item label="网址">
-                    <el-link :href="scope.row.url">
+                    <a :href="scope.row.url">
                       <span>{{ scope.row.url }}</span>
-                    </el-link>
+                    </a>
                   </el-form-item>
                   <el-form-item label="详细日期">
                     <span>{{convertDate(scope.row.createTime)}}</span>
                   </el-form-item>
                   <el-form-item label="位于文章">
                     <router-link
-                      :to="{name: 'edit', props: {id: scope.row.post._id},query: {id: scope.row.post._id}}"
+                      :to="{name: 'edit', 
+                      props: {id: scope.row.post._id},
+                      query: {id: scope.row.post._id}}"
                     >{{scope.row.post.title}}</router-link>
                   </el-form-item>
-                  <el-form-item label="内容">
-                    <span>{{ scope.row.content }}</span>
+                  <el-form-item v-if="scope.row.parent" label="上一条评论">{{scope.row.parent.content}}</el-form-item>
+                  <el-form-item :label="scope.row.parent ? '这条回复' : '内容'">
+                    <p v-html="md.render(scope.row.content)"></p>
                   </el-form-item>
                 </el-form>
               </template>
@@ -70,14 +84,30 @@
             <el-table-column label="位于">
               <template slot-scope="scope">
                 <router-link
+                  v-if="!scope.row.parent"
                   :to="{name: 'edit', props: {id: scope.row.post._id},query: {id: scope.row.post._id}}"
                 >{{scope.row.post.title}}</router-link>
-                <!-- <el-link :href="scope.row.post._id">{{scope.row.post.title}}</el-link> -->
+                <span v-if="scope.row.parent">
+                  这是一条评论回复
+                  <br />请展开查看详情
+                </span>
               </template>
             </el-table-column>
             <el-table-column fixed="right" label="操作" width="100">
               <template slot-scope="scope">
-                <el-button type="text" size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                <el-button
+                  v-if="activeName === '1'"
+                  type="text"
+                  size="small"
+                  @click="handleReply(scope.$index, scope.row)"
+                >回复</el-button>
+                <el-button
+                  v-if="activeName === '0'"
+                  type="text"
+                  size="small"
+                  @click="handlePass(scope.$index, scope.row)"
+                >通过</el-button>
+
                 <el-button
                   style="color: #F56C6C"
                   @click="handleDelete(scope.$index, scope.row)"
@@ -107,21 +137,25 @@
 import moment from "moment";
 import commentApi from "@/api/comments";
 import { setInterval, clearInterval } from "timers";
+import markdown from "markdown-it";
+const md = new markdown();
 moment.locale("zh-cn");
 export default {
   data() {
     return {
       comments: [],
+      info: {},
       options: {},
       loading: true,
       showBar: false,
       selectedItems: [],
       Interval: null,
-      activeName: "pass"
+      activeName: "0",
+      md
     };
   },
   methods: {
-    getCommentsList(page, keyword, state) {
+    getCommentsList(page, state, keyword) {
       this.loading = true;
       commentApi
         .getList({
@@ -130,8 +164,8 @@ export default {
           state
         })
         .then(res => {
-          console.log(res.data);
-          const data = res.data.map(item => {
+          //console.log(res.data);
+          const data = res.data.data.map(item => {
             // switch (item.state) {
             //   case 0:
             //     item.state = "待审核";
@@ -150,14 +184,48 @@ export default {
             return item;
           });
           this.comments = data;
+          this.options = res.data.options;
           this.loading = false;
         });
+      this.getCommentsNums();
     },
     onSearch() {},
     reset() {},
-    handleEdit(index, row) {},
+    handleReply(index, row) {
+      this.$prompt("请输入回复内容", "提示", {
+        confirmButtonText: "提交",
+        cancelButtonText: "取消"
+      }).then(({ value }) => {
+        commentApi
+          .reply({
+            pid: row.pid,
+            cid: row.cid,
+            content: value,
+            email: this.$store.state.user_data.email,
+            author: this.$store.state.user_data.username
+          })
+          .then(res => {
+            if (res.data.ok === 1) {
+              this.$message.success("回复成功");
+              this.getCommentsList(1, 1);
+            }
+          });
+      });
+    },
+    handlePass(index, row) {
+      commentApi.modState(row._id, 1).then(res => {
+        if (res.data.nModified === 1) {
+          this.$message.success("已通过");
+          this.getCommentsList(1, 0);
+        } else {
+          this.$message.error("出错了~");
+        }
+      });
+    },
     handleClick(tab, event) {
-      console.log(tab, event);
+      // console.log(tab.name);
+      // console.log(tab, event);
+      this.getCommentsList(1, tab.name);
     },
     async handleDelete(index, row) {},
     handleChangePage(page) {
@@ -165,7 +233,7 @@ export default {
       document.querySelector("body > main > ul").scrollIntoView({
         behavior: "smooth"
       });
-      // this.getCommentsList(page, this.search.keyword);
+      this.getCommentsList(page, Number(this.activeName));
     },
     handleSelectionChange(val) {},
     handleDelMore() {},
@@ -183,10 +251,15 @@ export default {
     },
     convertDate(timestamp) {
       return moment(new Date(timestamp)).format("YYYY MMMM Do, h:mm:ss a");
+    },
+    getCommentsNums() {
+      commentApi.getNum().then(res => {
+        this.info = res.data;
+      });
     }
   },
   created() {
-    this.getCommentsList(1);
+    this.getCommentsList(1, 0);
     this.setTimeUpdate();
   },
   destroyed() {
@@ -216,10 +289,14 @@ export default {
 .bax-card {
   min-height: 80vh;
 }
+.badge-a {
+  position: absolute;
+}
 </style>
 <style>
 .el-tabs__nav-wrap.is-top::after {
   width: 13rem;
+  /* width: 0; */
 }
 .demo-table-expand {
   font-size: 0;

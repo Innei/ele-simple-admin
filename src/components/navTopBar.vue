@@ -29,18 +29,15 @@ export default {
   data() {
     return {};
   },
-  props: {
-    user_data: {
-      type: Object,
-      required: true
-    }
-  },
   methods: {
     handleSelect(key, keyPath) {
       console.log(key, keyPath);
     }
   },
   computed: {
+    user_data() {
+      return this.$store.state.user_data;
+    },
     activeIndex() {
       return this.$route.path;
     }

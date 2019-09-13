@@ -16,7 +16,7 @@ api.getList = params => {
   return http({
     method: 'get',
     url: baseUrl,
-    ...params
+    params
   })
 }
 
@@ -26,4 +26,28 @@ api.del = id => {
     url: `${baseUrl}?id=${id}`
   })
 }
+
+api.getNum = () =>
+  http({
+    method: 'get',
+    url: `${baseUrl}/info`
+  })
+
+api.modState = (id, state) => {
+  return http({
+    method: 'put',
+    url: `${baseUrl}`,
+    params: {
+      id,
+      state
+    }
+  })
+}
+
+api.reply = data =>
+  http({
+    method: 'post',
+    url: `${baseUrl}/reply`,
+    data
+  })
 export default api

@@ -42,7 +42,7 @@
             <el-table-column type="selection"></el-table-column>
             <el-table-column prop="title" label="标题" width="180"></el-table-column>
             <el-table-column prop="state" label="状态" width="180"></el-table-column>
-            <el-table-column label="评论量" width="100"></el-table-column>
+            <el-table-column prop="comments" label="评论量" width="100"></el-table-column>
             <el-table-column prop="views" label="访问量" width="100"></el-table-column>
             <el-table-column prop="updateTime" label="更新时间"></el-table-column>
             <el-table-column fixed="right" label="操作" width="100">

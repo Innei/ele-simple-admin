@@ -30,12 +30,7 @@
 
         <!-- table start -->
         <el-main class="table">
-          <el-table
-            @selection-change="handleSelectionChange"
-            :data="comments"
-            style="overflow: auto"
-            v-loading="loading"
-          >
+          <el-table :data="comments" style="overflow: auto" v-loading="loading">
             <el-table-column type="expand">
               <template slot-scope="scope">
                 <el-form label-position="left" inline class="demo-table-expand">
@@ -72,7 +67,7 @@
                 </el-form>
               </template>
             </el-table-column>
-            <el-table-column type="selection"></el-table-column>
+
             <el-table-column prop="author" width="100" label="昵称"></el-table-column>
 
             <el-table-column prop="cTime" width="100" label="日期"></el-table-column>
@@ -93,7 +88,7 @@
                 </span>
               </template>
             </el-table-column>
-            <el-table-column fixed="right" label="操作" width="100">
+            <el-table-column fixed="right" label="操作" width="200">
               <template slot-scope="scope">
                 <el-button
                   v-if="activeName === '1'"
@@ -107,7 +102,12 @@
                   size="small"
                   @click="handlePass(scope.$index, scope.row)"
                 >通过</el-button>
-
+                <el-button
+                  v-if="activeName === '0'"
+                  type="text"
+                  size="small"
+                  @click="handleGomi(scope.$index, scope.row)"
+                >设为垃圾</el-button>
                 <el-button
                   style="color: #F56C6C"
                   @click="handleDelete(scope.$index, scope.row)"
@@ -148,7 +148,7 @@ export default {
       options: {},
       loading: true,
       showBar: false,
-      selectedItems: [],
+
       Interval: null,
       activeName: "0",
       md
@@ -222,12 +222,41 @@ export default {
         }
       });
     },
+    handleGomi(index, row) {
+      commentApi.modState(row._id, 2).then(res => {
+        if (res.data.nModified === 1) {
+          this.$message.success("已设为垃圾");
+          this.getCommentsList(1, 0);
+        } else {
+          this.$message.error("出错了~");
+        }
+      });
+    },
     handleClick(tab, event) {
       // console.log(tab.name);
       // console.log(tab, event);
       this.getCommentsList(1, tab.name);
     },
-    async handleDelete(index, row) {},
+    handleDelete(index, row) {
+      this.$confirm(`此操作将永久删除该评论, 是否继续?`, "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(async () => {
+          const data = (await commentApi.del(row._id)).data;
+          if (data.ok === 1 && data.deleteCount >= 1) {
+            this.$message.success("删除成功");
+            this.getCommentsList(1, Number(this.activeName));
+          }
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除"
+          });
+        });
+    },
     handleChangePage(page) {
       // 平滑滚动
       document.querySelector("body > main > ul").scrollIntoView({
@@ -235,8 +264,7 @@ export default {
       });
       this.getCommentsList(page, Number(this.activeName));
     },
-    handleSelectionChange(val) {},
-    handleDelMore() {},
+
     setTimeUpdate() {
       this.Interval = setInterval(() => {
         this.comments.map(item => {

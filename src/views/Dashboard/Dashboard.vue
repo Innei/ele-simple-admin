@@ -71,7 +71,7 @@
                 convertDate(item.createTime).day
                 }}
               </span>
-              {{item.author}}: {{ item.content }}
+              {{item.author}}: {{ (item.content).length > 30 ? item.content.slice(0, 30) + ' ...' : item.content }}
             </li>
           </el-card>
         </el-col>
@@ -82,42 +82,6 @@
         </el-col>
       </el-row>
     </el-main>
-
-    <!--   <el-main>
-      <el-card class="box-card">
-        <h2>你好，{{ userData.username }}</h2>
-
-        <div class="container">
-          <header>个人信息</header>
-
-          <main>
-            <div>
-              账号创建时间： {{ createDate.year }}年{{ createDate.month }}月{{
-              createDate.day
-              }}日
-            </div>
-            <div>距离现在已有 {{ commemorationDay }} 天</div>
-            <div>目前有 {{ userData.options.publish_nums }} 篇文章</div>
-          </main>
-        </div>
-
-        <div class="container">
-          <header>最近发布的文章</header>
-
-          <main>
-            <li v-for="item in userData.recentlyPosts" :key="item._id">
-              {{ convertDate(item.createTime).month }}/{{
-              convertDate(item.createTime).day
-              }}
-              <el-link
-                :href="'http://localhost:3000/posts/' + item._id"
-                target="_blank"
-              >{{ item.title }}</el-link>
-            </li>
-          </main>
-        </div>
-      </el-card>
-    </el-main>-->
   </el-container>
 </template>
 
@@ -131,7 +95,7 @@ export default {
     };
   },
   components: {
-    loading: () => import("./../components/Skeleton")
+    loading: () => import("@/components/Skeleton")
   },
   created() {
     this.$http.get("/user/get_info/1").then(res => {

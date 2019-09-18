@@ -13,6 +13,7 @@
 <script>
 import NavBar from "../components/navTopBar.vue";
 import Breadcrumb from "../components/Breadcrumb.vue";
+import userApi from "@/api/user";
 export default {
   data() {
     return {};
@@ -22,10 +23,14 @@ export default {
     Breadcrumb
   },
   created() {
-    this.$http.get("/user/1").then(res => {
-      this.$store.commit("setUser", res.data.username);
-      this.$store.commit("setEmail", res.data.email);
-    });
+    userApi
+      .getUserData({
+        id: localStorage.uid
+      })
+      .then(res => {
+        this.$store.commit("setUser", res.data.username);
+        this.$store.commit("setEmail", res.data.email);
+      });
   }
 };
 </script>

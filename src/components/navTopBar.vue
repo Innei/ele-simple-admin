@@ -18,7 +18,7 @@
 
     <el-submenu index="3" style="float: right">
       <template slot="title">{{ user_data.username }}</template>
-      <el-menu-item>登出</el-menu-item>
+      <el-menu-item @click="logout">登出</el-menu-item>
       <el-menu-item>设置</el-menu-item>
     </el-submenu>
   </el-menu>
@@ -26,12 +26,14 @@
 
 <script>
 export default {
-  data() {
-    return {};
-  },
   methods: {
     handleSelect(key, keyPath) {
       console.log(key, keyPath);
+    },
+    logout() {
+      localStorage.clear();
+      this.$router.push("/login");
+      this.$message.success("登出成功");
     }
   },
   computed: {

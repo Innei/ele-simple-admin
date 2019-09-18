@@ -15,7 +15,7 @@ const router = new Router({
           path: '/dashboard',
           name: 'dashboard',
           meta: { title: ['概要'] },
-          component: () => import('./views/Dashboard.vue')
+          component: () => import('./views/Dashboard/Dashboard.vue')
         },
         {
           path: '/posts',

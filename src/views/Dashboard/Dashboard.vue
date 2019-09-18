@@ -58,7 +58,7 @@
                 convertDate(item.createTime).day
                 }}
               </span>
-              <a :href="'http://localhost:3000/posts/' + item._id" target="_blank">{{ item.title }}</a>
+              <a :href="'http://' + baseUrl + '/posts/' + item._id" target="_blank">{{ item.title }}</a>
             </li>
           </el-card>
         </el-col>
@@ -115,6 +115,9 @@ export default {
     }
   },
   computed: {
+    baseUrl() {
+      return this.$store.state.siteOptions.baseUrl;
+    },
     createDate() {
       const date = new Date(Number(this.userData.create_time));
 

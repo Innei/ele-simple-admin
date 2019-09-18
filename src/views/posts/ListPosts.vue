@@ -45,8 +45,15 @@
             <el-table-column prop="comments" label="评论量" width="100"></el-table-column>
             <el-table-column prop="views" label="访问量" width="100"></el-table-column>
             <el-table-column prop="updateTime" label="更新时间"></el-table-column>
-            <el-table-column fixed="right" label="操作" width="100">
+            <el-table-column fixed="right" label="操作" width="150">
               <template slot-scope="scope">
+                <el-button
+                  type="text"
+                  size="small"
+                  id="clip"
+                  :data-clipboard-text="'http://' + baseUrl + '/posts/' + scope.row._id"
+                  @click="handleCopy(scope.$index, scope.row)"
+                >分享</el-button>
                 <el-button type="text" size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
                 <el-button
                   style="color: #F56C6C"
@@ -77,6 +84,7 @@
 import moment from "moment";
 import postApi from "@/api/post";
 import { setInterval, clearInterval } from "timers";
+import Clipboard from "clipboard";
 moment.locale("zh-cn");
 export default {
   data() {
@@ -92,6 +100,11 @@ export default {
       selectedItems: [],
       Interval: null
     };
+  },
+  computed: {
+    baseUrl() {
+      return this.$store.state.siteOptions.baseUrl;
+    }
   },
   methods: {
     getPostsList(page, keyword, state) {
@@ -235,6 +248,21 @@ export default {
     clearInterval() {
       clearInterval(this.Interval);
       console.log("clear interval.");
+    },
+    handleCopy() {
+      const clipboard = new Clipboard("#clip");
+      clipboard.on("success", e => {
+        this.$message.success("复制成功, " + e.text);
+        
+        // 释放内存
+        clipboard.destroy();
+      });
+      clipboard.on("error", e => {
+        // 不支持复制
+        this.$message.error("该浏览器不支持自动复制");
+        // 释放内存
+        clipboard.destroy();
+      });
     }
   },
   created() {

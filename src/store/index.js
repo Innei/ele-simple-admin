@@ -17,6 +17,9 @@ export default new Vuex.Store({
     user_data: {
       username: null,
       email: null
+    },
+    siteOptions: {
+      baseUrl: ''
     }
   },
   mutations: {
@@ -25,6 +28,9 @@ export default new Vuex.Store({
     },
     setEmail(state, email) {
       state.user_data.email = email
+    },
+    setUrl(state, url) {
+      state.siteOptions.baseUrl = url
     }
   },
   actions: {},

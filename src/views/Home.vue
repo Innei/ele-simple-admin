@@ -31,6 +31,13 @@ export default {
         this.$store.commit("setUser", res.data.username);
         this.$store.commit("setEmail", res.data.email);
       });
+
+    if (process.env.VUE_APP_SERVER_URL) {
+      const baseUrl = process.env.VUE_APP_SERVER_URL.match(/\/\/(.*?)\//)[1];
+      this.$store.commit("setUrl", baseUrl);
+    } else {
+      this.$store.commit("setUrl", "localhost");
+    }
   }
 };
 </script>

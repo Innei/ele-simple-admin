@@ -6,6 +6,7 @@
           <el-input v-model="model.title" :autofocus="id ? false : true" placeholder="标题"></el-input>
         </el-form-item>
         <mavonEditor
+          :boxShadow="false"
           :autofocus="false"
           @change="autoSavePost()"
           @save="save(false)"
@@ -137,7 +138,7 @@ export default {
           });
         }
         // const response = await postApi.create(this.model);
-        this.$router.push("/manage/list");
+        this.$router.push("/posts/list");
       } catch (e) {
         console.log(e);
         this.$message.error("出错了");
@@ -154,7 +155,7 @@ export default {
         }
 
         if (push) {
-          this.$router.push("/manage/list");
+          this.$router.push("/posts/list");
         }
       } else {
         this.$message.error("出错了");

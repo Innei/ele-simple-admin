@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Home from './views/Home.vue'
+
 Vue.use(Router)
 
 const router = new Router({
@@ -43,6 +44,26 @@ const router = new Router({
           name: 'comments',
           component: () => import('./views/comments/ListComments.vue'),
           meta: { title: ['评论'] }
+        },
+        {
+          path: '/options',
+          name: 'options',
+          component: () => import('./views/options/index.vue'),
+          meta: { title: ['设定'] },
+          children: [
+            {
+              path: 'profile',
+              name: 'profile',
+              component: () => import('./views/options/UserOptions/profile.vue'),
+              meta: { title: ['设定', '个人设置'] }
+            },
+            {
+              path: 'security',
+              name: 'security',
+              component: () => import('./views/options/UserOptions/security.vue'),
+              meta: { title: ['设定', '安全设置'] }
+            }
+          ]
         }
       ]
     },

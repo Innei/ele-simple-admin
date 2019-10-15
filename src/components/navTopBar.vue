@@ -18,8 +18,8 @@
 
     <el-submenu index="3" style="float: right">
       <template slot="title">{{ user_data.username }}</template>
+      <el-menu-item @click="to('options')">设定</el-menu-item>
       <el-menu-item @click="logout">登出</el-menu-item>
-      <el-menu-item>设置</el-menu-item>
     </el-submenu>
   </el-menu>
 </template>
@@ -34,6 +34,9 @@ export default {
       localStorage.clear();
       this.$router.push("/login");
       this.$message.success("登出成功");
+    },
+    to(name) {
+      this.$router.push({ name })
     }
   },
   computed: {

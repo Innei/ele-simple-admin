@@ -1,6 +1,6 @@
 <template>
   <el-container style="min-height: calc(100vh - 13rem);">
-    <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
+    <el-aside width="200px" style="background-image: linear-gradient(#eee 50%,#fff) ">
       <el-menu :default-openeds="['1']" unique-opened :default-active="$route.path" router>
         <el-submenu index="1">
           <template slot="title"><i class="el-icon-user-solid"></i>用户设置</template>

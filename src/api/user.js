@@ -22,4 +22,6 @@ api.getUserData = params =>
 api.update = data => {
   return http.put(`${ baseUrl }/update`, data)
 }
+
+api.reset = data => http.post(`${ baseUrl }/reset`, data)
 export default api

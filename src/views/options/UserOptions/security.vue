@@ -1,5 +1,5 @@
 <template>
-  <layout :data="data" :rules="rules" @submit="submit">
+  <layout :data="data" :rules="rules" @submit="submit" @reset="reset($e)">
     <template v-slot:items>
       <h2>密码设置</h2>
       <el-form-item label="请输入旧密码" prop="password">
@@ -77,11 +77,14 @@
         if (data.ok === 1 && data.nModified === 1) {
           this.$message.success('修改成功')
 
-          for (const key of Object.keys(this.data)) {
-            this.data[key] = ''
-          }
+          this.reset()
         }
       },
+      reset() {
+        for (const key of Object.keys(this.data)) {
+          this.data[key] = ''
+        }
+      }
     }
   }
 </script>

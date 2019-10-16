@@ -23,6 +23,7 @@ const router = new Router({
           name: 'posts',
           component: () => import('./layout/BlankLayout.vue'),
           meta: { title: ['文章'] },
+          redirect: '/posts/list',
           children: [
             {
               path: 'edit',
@@ -50,6 +51,7 @@ const router = new Router({
           name: 'options',
           component: () => import('./views/options/index.vue'),
           meta: { title: ['设定'] },
+          redirect: '/options/profile',
           children: [
             {
               path: 'profile',
@@ -62,6 +64,16 @@ const router = new Router({
               name: 'security',
               component: () => import('./views/options/UserOptions/security.vue'),
               meta: { title: ['设定', '安全设置'] }
+            },
+            {
+              path: 'posts',
+              component: () => import('./views/options/BlogOptions/posts.vue'),
+              meta: { title: ['设定', '文章设置'] }
+            },
+            {
+              path: 'comments',
+              component: () => import('./views/options/BlogOptions/comments.vue'),
+              meta: { title: ['设定', '评论设置'] }
             }
           ]
         }

@@ -5,14 +5,14 @@
              status-icon
              :rules="rules"
              ref="data"
-             label-width="100px"
-             label-position="top"
+             :label-width="params.labelWidth ? params.labelWidth : '100px'"
+             :label-position="params.pos ? params.pos : 'top'"
              class="form"
     >
       <div class="main-wrap" style="min-height: calc(100vh - 22rem)">
         <slot name="items"></slot>
       </div>
-      <el-form-item style="text-align: right">
+      <el-form-item style="text-align: right" v-if="!params.hideSubmit">
         <el-button type="primary" @click="submitForm('data')">提交</el-button>
         <el-button @click="resetForm('data')">重置</el-button>
       </el-form-item>
@@ -27,7 +27,11 @@
         type: Object,
         default: {}
       },
-      data: {}
+      data: {},
+      params: {
+        type: Object,
+        default: {}
+      }
     },
     methods: {
       resetForm(formName) {

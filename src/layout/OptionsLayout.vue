@@ -25,12 +25,16 @@
     props: {
       rules: {
         type: Object,
-        default: {}
+        default() {
+          return {}
+        }
       },
       data: {},
       params: {
         type: Object,
-        default: {}
+        default() {
+          return {}
+        }
       }
     },
     methods: {

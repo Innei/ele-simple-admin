@@ -296,4 +296,11 @@ export default {
 .bax-card {
   min-height: 80vh;
 }
+
+</style>
+
+<style>
+.el-table__body-wrapper.is-scrolling-left::-webkit-scrollbar {
+  height: 5px;
+}
 </style>

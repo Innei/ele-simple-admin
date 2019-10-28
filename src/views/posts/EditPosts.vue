@@ -109,29 +109,25 @@ export default {
   methods: {
     async submit() {
       try {
-        let response;
         if (this.id || this.$route.query.id) {
           if (this.draft) {
             if (!this.pid) {
-              response = await postApi.create(this.model);
+              await postApi.create(this.model);
             } else {
-              response = await postApi.edit(this.id, this.model, {
+              await postApi.edit(this.id, this.model, {
                 update: 1,
                 pid: this.pid
               });
             }
           } else {
-            response = await postApi.edit(
-              this.id || this.$route.query.id,
-              this.model
-            );
+            await postApi.edit(this.id || this.$route.query.id, this.model);
           }
 
           // if (response.data.ok !== 1) {
           //   this.$message.error("出错了");
           // }
         } else {
-          response = await postApi.create(this.model);
+          await postApi.create(this.model);
           this.$message({
             message: "提交成功",
             type: "success"
@@ -262,9 +258,9 @@ export default {
     console.log("Interval cleared.");
   },
   watch: {
-    $route(to, from) {
+    $route() {
       this.getPostInfo();
-      clearInterval(this.Interval);
+      this.Interval = clearInterval(this.Interval);
       console.log("Interval cleared.");
     }
   }

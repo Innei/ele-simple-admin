@@ -104,8 +104,8 @@
       })
     },
     methods: {
-      convertDate(date) {
-        var date = new Date(Number(date))
+      convertDate(d) {
+        const date = new Date(Number(d))
         const year = date.getFullYear()
         const month = date.getMonth() + 1
         const day = date.getDate()

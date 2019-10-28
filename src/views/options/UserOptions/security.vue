@@ -76,8 +76,8 @@
         const data = (await userApi.reset(this.data)).data
         if (data.ok === 1 && data.nModified === 1) {
           this.$message.success('修改成功')
-
-          this.reset()
+          localStorage.clear()
+          this.$router.push('/login')
         }
       },
       reset() {
